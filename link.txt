@@ -1,0 +1,26 @@
+link [options] obj obj obj ...
+
+-b            - Output straight binary
+-c            - Output in .cmd format
+-e            - Output Elf/OS executable
+-i            - Output Intel hex
+-h            - Output RCS hex
+-s            - Show public symbols
+-o name       - Specify output filename
+-be           - Use big-endian mode
+-le           - Use little-endian mode
+
+object file structure
+---------------------
+.big                 - Use big-endian mode
+.little              - Use little-endian mode
+:addr bb bb bb ...   - Program bytes
+@addr                - Start address
+?name addr           - External reference used at addr
+=name value          - public symbol
+{name                - begin relocatable procedure
+}                    - end relocatable procedure
++addr                - apply module offset at addr
+/name addr           - add byte at addr with high of name
+\name addr           - add byte at addr with low of name
+

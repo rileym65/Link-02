@@ -1,0 +1,9 @@
+link02
+*.o
+*.prg
+*.asm
+*.hex
+*.bin
+*.elfos
+*.cmd
+
