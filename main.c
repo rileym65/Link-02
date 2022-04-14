@@ -84,8 +84,8 @@ int loadFile(char* filename) {
     }
   while (fgets(buffer, 1023, file) != NULL) {
     line = buffer;
-    if (strcmp(line,".big") == 0) addressMode = 'B';
-    else if (strcmp(line,".little") == 0) addressMode = 'L';
+    if (strncmp(line,".big",4) == 0) addressMode = 'B';
+    else if (strncmp(line,".little",7) == 0) addressMode = 'L';
     else if (*line == ':') {
       line++;
       line = getHex(line, &address);
@@ -224,8 +224,8 @@ int link() {
         writeMem(address, v);
         }
       if (types[i] == 'H') {
-        v = memory[address] + values[s];
-        memory[address] = (v >> 8) & 0xff;
+        v = memory[address] + (values[s] >> 8);
+        memory[address] = v & 0xff;
         }
       if (types[i] == 'L') {
         v = memory[address] + values[s];

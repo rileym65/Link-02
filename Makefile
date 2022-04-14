@@ -18,5 +18,9 @@ clean:
 	-rm *.o
 	-rm $(PROJECT)
 
+install:
+	cp link02 /usr/local/bin
+	chmod a+rx /usr/local/bin/link02
+
 main.o:                header.h main.c
 
