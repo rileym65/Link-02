@@ -111,9 +111,9 @@ int loadFile(char* filename) {
     else if (*line == '+') {
       line++;
       line = getHex(line, &addr);
-      value = readMem(addr);
+      value = readMem(addr+offset);
       value += offset;
-      writeMem(addr, value);
+      writeMem(addr+offset, value);
       }
     else if (*line == '=') {
       line++;
@@ -149,6 +149,7 @@ int loadFile(char* filename) {
       token[pos] = 0;
       while (*line == ' ') line++;
       getHex(line, &value);
+      if (inProc) value += offset;
       addReference(token, value, 'W');
       }
     else if (*line == '/') {
@@ -158,6 +159,7 @@ int loadFile(char* filename) {
       token[pos] = 0;
       while (*line == ' ') line++;
       getHex(line, &value);
+      if (inProc) value += offset;
       addReference(token, value, 'H');
       }
     else if (*line == '\\') {
@@ -167,6 +169,7 @@ int loadFile(char* filename) {
       token[pos] = 0;
       while (*line == ' ') line++;
       getHex(line, &value);
+      if (inProc) value += offset;
       addReference(token, value, 'L');
       }
     else if (*line == '{') {
