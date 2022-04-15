@@ -115,6 +115,20 @@ int loadFile(char* filename) {
       value += offset;
       writeMem(addr+offset, value);
       }
+    else if (*line == '^') {
+      line++;
+      line = getHex(line, &addr);
+      value = memory[addr+offset];
+      value += ((offset >> 8) & 0xff);
+      memory[addr+offset] = value & 0xff;
+      }
+    else if (*line == 'v') {
+      line++;
+      line = getHex(line, &addr);
+      value = memory[addr+offset];
+      value += (offset & 0xff);
+      memory[addr+offset] = value & 0xff;
+      }
     else if (*line == '=') {
       line++;
       pos = 0;
