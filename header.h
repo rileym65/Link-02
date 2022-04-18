@@ -6,6 +6,15 @@
 #include <string.h>
 #include <fcntl.h>
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <io.h>
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#else
+#include <unistd.h>
+#define O_BINARY 0
+#endif
+
 #ifdef MAIN
 #define LINK
 #else
@@ -52,4 +61,3 @@ LINK char  *requireAdded;
 LINK int    numRequires;
 
 #endif
-

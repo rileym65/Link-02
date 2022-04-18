@@ -241,7 +241,7 @@ int loadFile(char* filename) {
         for (i=0; i<numReferences; i++)
           if (strcmp(references[i], token) == 0) {
             loadModule = -1;
-            printf("Linking %s from library\n");
+            printf("Linking %s from library\n", token);
             }
         if (loadModule == 0) {
           for (i=0; i<numRequires; i++)
@@ -339,7 +339,7 @@ void link() {
 
 void outputBinary() {
   int file;
-  file = open(outName, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  file = open(outName, O_WRONLY | O_CREAT | O_TRUNC|O_BINARY, 0666);
   write(file, memory+lowest, (highest-lowest)+1);
   close(file);
   }
@@ -359,7 +359,7 @@ void outputElfos() {
   header[3] = size & 0xff;
   header[4] = (exec >> 8) & 0xff;
   header[5] = exec & 0xff;
-  file = open(outName, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+  file = open(outName, O_WRONLY | O_CREAT | O_TRUNC|O_BINARY, 0666);
   write(file, header, 6);
   write(file, memory+lowest, (highest-lowest)+1);
   close(file);
@@ -671,4 +671,3 @@ int main(int argc, char **argv) {
     }
   printf("\n");
   }
-
