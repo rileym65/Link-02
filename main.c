@@ -215,7 +215,7 @@ int loadFile(char* filename) {
         for (i=0; i<numReferences; i++)
           if (strcmp(references[i], token) == 0) {
             loadModule = -1;
-            printf("Linking %s from library\n");
+            printf("Linking %s from library\n", token);
             }
         }
       if (loadModule != 0) {
@@ -636,4 +636,3 @@ int main(int argc, char **argv) {
     }
   printf("\n");
   }
-
