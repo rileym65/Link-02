@@ -8,12 +8,14 @@ link @controlfile
 -h            - Output RCS hex
 -s            - Show public symbols
 -o name       - Specify output filename
+-l name       - Specify library to search
 -be           - Use big-endian mode
 -le           - Use little-endian mode
 
 Control file
 ------------
 add filename         - add specified object file
+library filename     - add library to search
 mode big             - set big-endian mode
 mode little          - set little-endian mode
 mode binary          - set binary output mode

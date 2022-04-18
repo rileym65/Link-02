@@ -42,6 +42,11 @@ LINK int    numReferences;
 LINK int    inProc;
 LINK word   offset;
 LINK char   addressMode;
+LINK char **libraries;
+LINK int    numLibraries;
+LINK int    resolved;
+LINK int    libScan;
+LINK int    loadModule;
 
 #endif
 

@@ -65,6 +65,26 @@ void addReference(char* name, word value, char typ) {
   types[numReferences-1] = typ;
   }
 
+void addLibrary(char* name) {
+  numLibraries++;
+  if (numLibraries == 1)
+    libraries = (char**)malloc(sizeof(char*));
+  else
+    libraries = (char**)realloc(libraries,sizeof(char*)*numLibraries);
+  libraries[numLibraries-1] = (char*)malloc(strlen(name)+1);
+  strcpy(libraries[numLibraries-1],name);
+  }
+
+void addObject(char* name) {
+  numObjects++;
+  if (numObjects == 1)
+    objects = (char**)malloc(sizeof(char*));
+  else
+    objects = (char**)realloc(objects,sizeof(char*)*numObjects);
+  objects[numObjects-1] = (char*)malloc(strlen(name)+1);
+  strcpy(objects[numObjects-1],name);
+  }
+
 int loadFile(char* filename) {
   int   i;
   char  buffer[1024];
@@ -74,7 +94,7 @@ int loadFile(char* filename) {
   word  value;
   word  addr;
   char *line;
-  printf("Linking: %s\n",filename);
+  if (libScan == 0) printf("Linking: %s\n",filename);
   inProc = 0;
   offset = 0;
   file = fopen(filename,"r");
@@ -86,7 +106,7 @@ int loadFile(char* filename) {
     line = buffer;
     if (strncmp(line,".big",4) == 0) addressMode = 'B';
     else if (strncmp(line,".little",7) == 0) addressMode = 'L';
-    else if (*line == ':') {
+    else if (*line == ':' && loadModule != 0) {
       line++;
       line = getHex(line, &address);
       if (inProc) address += offset;
@@ -108,28 +128,28 @@ int loadFile(char* filename) {
       line=buffer+1;
       getHex(line, &startAddress);
       }
-    else if (*line == '+') {
+    else if (*line == '+' && loadModule != 0) {
       line++;
       line = getHex(line, &addr);
       value = readMem(addr+offset);
       value += offset;
       writeMem(addr+offset, value);
       }
-    else if (*line == '^') {
+    else if (*line == '^' && loadModule != 0) {
       line++;
       line = getHex(line, &addr);
       value = memory[addr+offset];
       value += ((offset >> 8) & 0xff);
       memory[addr+offset] = value & 0xff;
       }
-    else if (*line == 'v') {
+    else if (*line == 'v' && loadModule != 0) {
       line++;
       line = getHex(line, &addr);
       value = memory[addr+offset];
       value += (offset & 0xff);
       memory[addr+offset] = value & 0xff;
       }
-    else if (*line == '=') {
+    else if (*line == '=' && loadModule != 0) {
       line++;
       pos = 0;
       while (*line != 0 && *line > ' ') token[pos++] = *line++;
@@ -156,7 +176,7 @@ int loadFile(char* filename) {
       strcpy(symbols[numSymbols-1], token);
       values[numSymbols-1] = value;
       }
-    else if (*line == '?') {
+    else if (*line == '?' && loadModule != 0) {
       line++;
       pos = 0;
       while (*line != 0 && *line > ' ') token[pos++] = *line++;
@@ -166,7 +186,7 @@ int loadFile(char* filename) {
       if (inProc) value += offset;
       addReference(token, value, 'W');
       }
-    else if (*line == '/') {
+    else if (*line == '/' && loadModule != 0) {
       line++;
       pos = 0;
       while (*line != 0 && *line > ' ') token[pos++] = *line++;
@@ -176,7 +196,7 @@ int loadFile(char* filename) {
       if (inProc) value += offset;
       addReference(token, value, 'H');
       }
-    else if (*line == '\\') {
+    else if (*line == '\\' && loadModule != 0) {
       line++;
       pos = 0;
       while (*line != 0 && *line > ' ') token[pos++] = *line++;
@@ -191,50 +211,64 @@ int loadFile(char* filename) {
       pos = 0;
       while (*line != 0 && *line > ' ') token[pos++] = *line++;
       token[pos] = 0;
-      value = address;
-      for (i=0; i<numSymbols; i++)
-        if (strcmp(token, symbols[i]) == 0) {
-          printf("Error: Duplicate symbol: %s\n",token);
-          fclose(file);
-          return -1;
+      if (libScan != 0) {
+        for (i=0; i<numReferences; i++)
+          if (strcmp(references[i], token) == 0) {
+            loadModule = -1;
+            printf("Linking %s from library\n");
+            }
+        }
+      if (loadModule != 0) {
+        value = address;
+        for (i=0; i<numSymbols; i++)
+          if (strcmp(token, symbols[i]) == 0) {
+            printf("Error: Duplicate symbol: %s\n",token);
+            fclose(file);
+            return -1;
+            }
+        inProc = -1;
+        offset = address;
+        numSymbols++;
+        if (numSymbols == 1) {
+          symbols = (char**)malloc(sizeof(char*));
+          values = (word*)malloc(sizeof(word));
           }
-      inProc = -1;
-      offset = address;
-      numSymbols++;
-      if (numSymbols == 1) {
-        symbols = (char**)malloc(sizeof(char*));
-        values = (word*)malloc(sizeof(word));
+        else {
+          symbols = (char**)realloc(symbols,sizeof(char*)*numSymbols);
+          values = (word*)realloc(values,sizeof(word)*numSymbols);
+          }
+        symbols[numSymbols-1] = (char*)malloc(strlen(token) + 1);
+        strcpy(symbols[numSymbols-1], token);
+        values[numSymbols-1] = value;
         }
-      else {
-        symbols = (char**)realloc(symbols,sizeof(char*)*numSymbols);
-        values = (word*)realloc(values,sizeof(word)*numSymbols);
-        }
-      symbols[numSymbols-1] = (char*)malloc(strlen(token) + 1);
-      strcpy(symbols[numSymbols-1], token);
-      values[numSymbols-1] = value;
       }
     else if (*line == '}') {
       inProc = 0;
       offset = 0;
+      if (libScan != 0) loadModule = 0;
       }
     }
   fclose(file);
   return 0;
   }
 
-int link() {
+void link() {
   int i;
+  int j;
   int s;
   int errors;
   word v;
   errors=0;
-  for (i=0; i<numReferences; i++) {
+  resolved = 0;
+  i = 0;
+//  for (i=0; i<numReferences; i++) {
+  while (i < numReferences) {
     s = findSymbol(references[i]);
     if (s < 0) {
-      printf("Symbol not found: %s\n",references[i]);
-      errors++;
+      i++;
       }
     else {
+      resolved++;
       address = addresses[i];
       if (types[i] == 'W') {
         v = readMem(address) + values[s];
@@ -248,10 +282,25 @@ int link() {
         v = memory[address] + values[s];
         memory[address] = v & 0xff;
         }
+      free(references[i]);
+      for (j=i; j<numReferences-1; j++) {
+        references[j] = references[j+1];
+        addresses[j] = addresses[j+1];
+        types[j] = types[j+1];
+        }
+      numReferences--;
+      if (numReferences > 0) {
+        references = (char**)realloc(references,sizeof(char*)*numReferences);
+        addresses = (word*)realloc(addresses,sizeof(word)*numReferences);
+        types = (char*)realloc(types,sizeof(char)*numReferences);
+        }
+      else {
+        free(references);
+        free(addresses);
+        free(types);
+        }
       }
     }
-  if (errors != 0) return -1;
-  return 0;
   }
 
 void outputBinary() {
@@ -472,13 +521,11 @@ void readControlFile(char* filename) {
       }
     if (strncasecmp(line,"add ",4) == 0) {
       pchar = line + 4;
-      numObjects++;
-      if (numObjects == 1)
-        objects = (char**)malloc(sizeof(char*));
-      else
-        objects = (char**)realloc(objects,sizeof(char*)*numObjects);
-      objects[numObjects-1] = (char*)malloc(strlen(pchar)+1);
-      strcpy(objects[numObjects-1],pchar);
+      addObject(pchar);
+      }
+    if (strncasecmp(line,"library ",8) == 0) {
+      pchar = line + 8;
+      addLibrary(pchar);
       }
     }
   }
@@ -495,6 +542,7 @@ int main(int argc, char **argv) {
   showSymbols = 0;
   numSymbols = 0;
   numReferences = 0;
+  numLibraries = 0;
   addressMode = 'L';
   strcpy(outName,"");
   outMode = BM_BINARY;
@@ -514,14 +562,12 @@ int main(int argc, char **argv) {
     else if (argv[i][0] == '@') {
       readControlFile(argv[i]+1);
       }
+    else if (strcmp(argv[i], "-l") == 0) {
+      i++;
+      addLibrary(argv[i]);
+      }
     else {
-      numObjects++;
-      if (numObjects == 1)
-        objects = (char**)malloc(sizeof(char*));
-      else
-        objects = (char**)realloc(objects,sizeof(char*)*numObjects);
-      objects[numObjects-1] = (char*)malloc(strlen(argv[i])+1);
-      strcpy(objects[numObjects-1],argv[i]);
+      addObject(argv[i]);
       }
     }
   if (numObjects == 0) {
@@ -543,12 +589,31 @@ int main(int argc, char **argv) {
     map[i] = 0;
     }
   address = 0;
+  resolved = 0;
+  libScan = 0;
+  loadModule = -1;
   for (i=0; i<numObjects; i++)
     if (loadFile(objects[i]) < 0) {
-      printf("Errors: aborting linke\n");
+      printf("Errors: aborting link\n");
       exit(1);
       }
-  if (link() < 0) {
+  link();
+  resolved = 1;
+  while (numReferences > 0 && resolved != 0) {
+    libScan = -1;
+    for (i=0; i<numLibraries; i++) {
+      loadModule = 0;
+      if (loadFile(libraries[i]) < 0) {
+        printf("Errors: aborting link\n");
+        exit(1);
+        }
+      }
+    link();
+    }
+  if (numReferences > 0) {
+    for (i=0; i<numReferences; i++) {
+      printf("Error: Symbol %s not found\n",references[i]);
+      }
     printf("Errors during link.  Aborting output\n");
     exit(1);
     }
