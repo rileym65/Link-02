@@ -1,4 +1,5 @@
 link [options] obj obj obj ...
+link @controlfile
 
 -b            - Output straight binary
 -c            - Output in .cmd format
@@ -9,6 +10,19 @@ link [options] obj obj obj ...
 -o name       - Specify output filename
 -be           - Use big-endian mode
 -le           - Use little-endian mode
+
+Control file
+------------
+add filename         - add specified object file
+mode big             - set big-endian mode
+mode little          - set little-endian mode
+mode binary          - set binary output mode
+mode cmd             - set .cmd output mode
+mode elfos           - set Elf/OS output mode
+mode intel           - set Intel hex output mode
+mode rcs             - set RCS hex output mode
+output filename      - filename for output
+
 
 object file structure
 ---------------------
