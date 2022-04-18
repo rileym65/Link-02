@@ -47,6 +47,9 @@ LINK int    numLibraries;
 LINK int    resolved;
 LINK int    libScan;
 LINK int    loadModule;
+LINK char **requires;
+LINK char  *requireAdded;
+LINK int    numRequires;
 
 #endif
 

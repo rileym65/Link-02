@@ -87,9 +87,11 @@ void addObject(char* name) {
 
 int loadFile(char* filename) {
   int   i;
+  int   j;
   char  buffer[1024];
   char  token[256];
   int   pos;
+  int   flag;
   FILE *file;
   word  value;
   word  addr;
@@ -106,6 +108,30 @@ int loadFile(char* filename) {
     line = buffer;
     if (strncmp(line,".big",4) == 0) addressMode = 'B';
     else if (strncmp(line,".little",7) == 0) addressMode = 'L';
+    else if (strncmp(line,".requires ",10) == 0) {
+      line += 10;
+      while (*line == ' ') line++;
+      pos = 0;
+      while (*line != 0 && *line > ' ') token[pos++] = *line++;
+      token[pos] = 0;
+      flag = 0;
+      for (i=0; i<numRequires; i++)
+        if (strcmp(token, requires[i]) == 0) flag = -1;
+      if (flag == 0) {
+        numRequires++;
+        if (numRequires == 1) {
+           requires = (char**)malloc(sizeof(char*));
+           requireAdded = (char*)malloc(sizeof(char));
+           }
+        else {
+           requires = (char**)realloc(requires, sizeof(char*) * numRequires);
+           requireAdded = (char*)realloc(requireAdded, sizeof(char) * numRequires);
+           }
+        requires[numRequires-1] = (char*)malloc(strlen(token)+1);
+        strcpy(requires[numRequires-1], token);
+        requireAdded[numRequires-1] = 'N';
+        }
+      }
     else if (*line == ':' && loadModule != 0) {
       line++;
       line = getHex(line, &address);
@@ -217,6 +243,14 @@ int loadFile(char* filename) {
             loadModule = -1;
             printf("Linking %s from library\n");
             }
+        if (loadModule == 0) {
+          for (i=0; i<numRequires; i++)
+            if (requireAdded[i] == 'N' && strcmp(requires[i], token) == 0) {
+              loadModule = -1;
+              requireAdded[i] = 'Y';
+              printf("Linking %s from library\n");
+              }
+          }
         }
       if (loadModule != 0) {
         value = address;
@@ -543,6 +577,7 @@ int main(int argc, char **argv) {
   numSymbols = 0;
   numReferences = 0;
   numLibraries = 0;
+  numRequires = 0;
   addressMode = 'L';
   strcpy(outName,"");
   outMode = BM_BINARY;

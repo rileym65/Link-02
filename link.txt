@@ -30,6 +30,7 @@ object file structure
 ---------------------
 .big                 - Use big-endian mode
 .little              - Use little-endian mode
+.require module      - Requre module to be included
 :addr bb bb bb ...   - Program bytes
 @addr                - Start address
 ?name addr           - External reference used at addr
