@@ -108,6 +108,14 @@ int loadFile(char* filename) {
     line = buffer;
     if (strncmp(line,".big",4) == 0) addressMode = 'B';
     else if (strncmp(line,".little",7) == 0) addressMode = 'L';
+    else if (strncmp(line,".library ",9) == 0) {
+      line += 9;
+      while (*line == ' ') line++;
+      pos = 0;
+      while (*line != 0 && *line > ' ') token[pos++] = *line++;
+      token[pos] = 0;
+      addLibrary(token);
+      }
     else if (strncmp(line,".requires ",10) == 0) {
       line += 10;
       while (*line == ' ') line++;
@@ -286,7 +294,7 @@ int loadFile(char* filename) {
   return 0;
   }
 
-void link() {
+void doLink() {
   int i;
   int j;
   int s;
@@ -632,7 +640,7 @@ int main(int argc, char **argv) {
       printf("Errors: aborting link\n");
       exit(1);
       }
-  link();
+  doLink();
   resolved = 1;
   while (numReferences > 0 && resolved != 0) {
     libScan = -1;
@@ -643,7 +651,7 @@ int main(int argc, char **argv) {
         exit(1);
         }
       }
-    link();
+    doLink();
     }
   if (numReferences > 0) {
     for (i=0; i<numReferences; i++) {
