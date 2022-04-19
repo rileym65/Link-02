@@ -678,4 +678,5 @@ int main(int argc, char **argv) {
       printf("%-20s %04x\n",symbols[i], values[i]);
     }
   printf("\n");
+  return 0;
   }
