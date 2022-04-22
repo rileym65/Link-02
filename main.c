@@ -108,6 +108,34 @@ int loadFile(char* filename) {
     line = buffer;
     if (strncmp(line,".big",4) == 0) addressMode = 'B';
     else if (strncmp(line,".little",7) == 0) addressMode = 'L';
+    else if (strncmp(line, ".align ",7) == 0 && inProc != 0) {
+      line += 7;
+      while (*line == ' ') line++;
+      if (strncmp(line,"word",4) == 0) {
+        offset = (offset + 1) & 0xfffe;
+        }
+      else if (strncmp(line,"dword",5) == 0) {
+        offset = (offset + 3) & 0xfffc;
+        }
+      else if (strncmp(line,"qword",5) == 0) {
+        offset = (offset + 7) & 0xfff8;
+        }
+      else if (strncmp(line,"para",4) == 0) {
+        offset = (offset + 15) & 0xfff0;
+        }
+      else if (strncmp(line,"32",2) == 0) {
+        offset = (offset + 31) & 0xffe0;
+        }
+      else if (strncmp(line,"64",2) == 0) {
+        offset = (offset + 63) & 0xffc0;
+        }
+      else if (strncmp(line,"128",3) == 0) {
+        offset = (offset + 127) & 0xff80;
+        }
+      else if (strncmp(line,"page",4) == 0) {
+        offset = (offset + 255) & 0xff00;
+        }
+      }
     else if (strncmp(line,".library ",9) == 0) {
       line += 9;
       while (*line == ' ') line++;
