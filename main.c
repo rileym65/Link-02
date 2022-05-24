@@ -282,7 +282,7 @@ int loadFile(char* filename) {
             if (requireAdded[i] == 'N' && strcmp(requires[i], token) == 0) {
               loadModule = -1;
               requireAdded[i] = 'Y';
-              printf("Linking %s from library\n");
+              printf("Linking %s from library\n", token);
               }
           }
         }
