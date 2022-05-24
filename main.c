@@ -200,15 +200,13 @@ int loadFile(char* filename) {
     else if (*line == '^' && loadModule != 0) {
       line++;
       line = getHex(line, &addr);
-      value = memory[addr+offset];
-      value += ((offset >> 8) & 0xff);
-      memory[addr+offset] = value & 0xff;
+      value = (memory[addr+offset] << 8) + offset;
+      memory[addr+offset] = (value >> 8) & 0xff;
       }
     else if (*line == 'v' && loadModule != 0) {
       line++;
       line = getHex(line, &addr);
-      value = memory[addr+offset];
-      value += (offset & 0xff);
+      value = memory[addr+offset] + offset;
       memory[addr+offset] = value & 0xff;
       }
     else if (*line == '=' && loadModule != 0) {
