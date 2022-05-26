@@ -598,6 +598,23 @@ void readControlFile(char* filename) {
     }
   }
 
+void sortSymbols() {
+  char flag;
+  int  i;
+  word t;
+  char *c;
+  flag = 1;
+  while (flag == 1) {
+    flag = 0;
+    for (i=0; i<numSymbols-1; i++)
+      if (values[i] > values[i+1]) {
+        c = symbols[i]; symbols[i] = symbols[i+1]; symbols[i+1] = c;
+        t = values[i];  values[i] = values[i+1]; values[i+1] = t;
+        flag = 1;
+        }
+    }
+  }
+
 int main(int argc, char **argv) {
   int   i;
   char *pchar;
@@ -700,9 +717,11 @@ int main(int argc, char **argv) {
   if (startAddress != 0xffff)
     printf("Start address  : %04x\n",startAddress);
   if (showSymbols) {
+    sortSymbols();
     for (i=0; i<numSymbols; i++)
       printf("%-20s %04x\n",symbols[i], values[i]);
     }
   printf("\n");
   return 0;
   }
+
