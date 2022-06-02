@@ -46,7 +46,7 @@ object file structure
 =name value          - public symbol
 {name                - begin relocatable procedure
 }                    - end relocatable procedure
-/name addr           - add byte at addr with high of name
+/name addr [lofs]    - add byte at addr with high of name
 \name addr           - add byte at addr with low of name
 +addr                - apply module offset at addr
 ^addr                - apply high byte of module offset at addr

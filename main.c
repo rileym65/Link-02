@@ -95,6 +95,7 @@ int loadFile(char* filename) {
   FILE *file;
   word  value;
   word  addr;
+  word  lofs;
   char *line;
   if (libScan == 0) printf("Linking: %s\n",filename);
   inProc = 0;
@@ -201,6 +202,9 @@ int loadFile(char* filename) {
       line++;
       line = getHex(line, &addr);
       value = (memory[addr+offset] << 8) + offset;
+      while (*line == ' ') line++;
+      getHex(line, &lofs);
+      value += lofs;
       memory[addr+offset] = (value >> 8) & 0xff;
       }
     else if (*line == 'v' && loadModule != 0) {
@@ -714,6 +718,7 @@ int main(int argc, char **argv) {
     }
   printf("Lowest address : %04x\n",lowest);
   printf("Highest address: %04x\n",highest);
+  printf("Public symbols : %d\n",numSymbols);
   if (startAddress != 0xffff)
     printf("Start address  : %04x\n",startAddress);
   if (showSymbols) {
