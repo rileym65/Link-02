@@ -329,6 +329,7 @@ void doLink() {
   int j;
   int s;
   int errors;
+  word address;
   word v;
   errors=0;
   resolved = 0;
