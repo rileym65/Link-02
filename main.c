@@ -47,21 +47,24 @@ void writeMem(word address, word value) {
   map[address+1] = 1;
   }
 
-void addReference(char* name, word value, char typ) {
+void addReference(char* name, word value, char typ, byte low) {
   numReferences++;
   if (numReferences == 1) {
     references = (char**)malloc(sizeof(char*));
     addresses = (word*)malloc(sizeof(word));
     types = (char*)malloc(sizeof(char));
+    lows = (byte*)malloc(sizeof(byte));
     }
   else {
     references = (char**)realloc(references,sizeof(char*)*numReferences);
     addresses = (word*)realloc(addresses,sizeof(word)*numReferences);
     types = (char*)realloc(types,sizeof(char)*numReferences);
+    lows = (byte*)realloc(lows,sizeof(byte)*numReferences);
     }
   references[numReferences-1] = (char*)malloc(strlen(name) + 1);
   strcpy(references[numReferences-1], name);
   addresses[numReferences-1] = value;
+  lows[numReferences-1] = low;
   types[numReferences-1] = typ;
   }
 
@@ -96,6 +99,7 @@ int loadFile(char* filename) {
   word  value;
   word  addr;
   word  lofs;
+  word  low;
   char *line;
   if (libScan == 0) printf("Linking: %s\n",filename);
   inProc = 0;
@@ -248,7 +252,7 @@ int loadFile(char* filename) {
       while (*line == ' ') line++;
       getHex(line, &value);
       if (inProc) value += offset;
-      addReference(token, value, 'W');
+      addReference(token, value, 'W', 0);
       }
     else if (*line == '/' && loadModule != 0) {
       line++;
@@ -256,9 +260,11 @@ int loadFile(char* filename) {
       while (*line != 0 && *line > ' ') token[pos++] = *line++;
       token[pos] = 0;
       while (*line == ' ') line++;
-      getHex(line, &value);
+      line = getHex(line, &value);
       if (inProc) value += offset;
-      addReference(token, value, 'H');
+      while (*line == ' ') line++;
+      getHex(line, &low);
+      addReference(token, value, 'H', low & 0xff);
       }
     else if (*line == '\\' && loadModule != 0) {
       line++;
@@ -268,7 +274,7 @@ int loadFile(char* filename) {
       while (*line == ' ') line++;
       getHex(line, &value);
       if (inProc) value += offset;
-      addReference(token, value, 'L');
+      addReference(token, value, 'L', 0);
       }
     else if (*line == '{') {
       line++;
@@ -348,7 +354,7 @@ void doLink() {
         writeMem(address, v);
         }
       if (types[i] == 'H') {
-        v = memory[address] + (values[s] >> 8);
+        v = ((memory[address] << 8) + values[s] + lows[i]) >> 8;
         memory[address] = v & 0xff;
         }
       if (types[i] == 'L') {
@@ -360,17 +366,20 @@ void doLink() {
         references[j] = references[j+1];
         addresses[j] = addresses[j+1];
         types[j] = types[j+1];
+        lows[j] = lows[j+1];
         }
       numReferences--;
       if (numReferences > 0) {
         references = (char**)realloc(references,sizeof(char*)*numReferences);
         addresses = (word*)realloc(addresses,sizeof(word)*numReferences);
         types = (char*)realloc(types,sizeof(char)*numReferences);
+        lows = (byte*)realloc(lows,sizeof(byte)*numReferences);
         }
       else {
         free(references);
         free(addresses);
         free(types);
+        free(lows);
         }
       }
     }

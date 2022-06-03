@@ -46,6 +46,7 @@ LINK int    numSymbols;
 LINK int    showSymbols;
 LINK char **references;
 LINK word  *addresses;
+LINK byte  *lows;
 LINK char  *types;
 LINK int    numReferences;
 LINK int    inProc;
