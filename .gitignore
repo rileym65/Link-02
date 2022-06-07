@@ -1,4 +1,5 @@
 link02
+tutorial.doc
 *.o
 *.prg
 *.asm
@@ -6,4 +7,7 @@ link02
 *.bin
 *.elfos
 *.cmd
-
+*.link
+*.lnk
+*.build
+*.lib
