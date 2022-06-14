@@ -149,7 +149,7 @@ int loadFile(char* filename) {
       token[pos] = 0;
       addLibrary(token);
       }
-    else if (strncmp(line,".requires ",10) == 0) {
+    else if (strncmp(line,".requires ",10) == 0 && loadModule != 0) {
       line += 10;
       while (*line == ' ') line++;
       pos = 0;
