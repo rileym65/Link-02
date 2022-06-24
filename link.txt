@@ -30,7 +30,7 @@ object file structure
 ---------------------
 .big                 - Use big-endian mode
 .little              - Use little-endian mode
-.require module      - Requre module to be included
+.requires module     - Requre module to be included
 .library filename    - Search specified library for references
 .align word          - Align procedure on word boundary (2 bytes)
 .align dword         - Align procedure on double word boundary (4 bytes)
@@ -51,3 +51,4 @@ object file structure
 +addr                - apply module offset at addr
 ^addr                - apply high byte of module offset at addr
 vaddr                - apply low byte of module offset at addr
+>inc                 - increase current address by 'inc'

@@ -173,6 +173,11 @@ int loadFile(char* filename) {
         requireAdded[numRequires-1] = 'N';
         }
       }
+    else if (*line == '>' && loadModule != 0) {
+      line++;
+      line = getHex(line, &value);
+      address += value;
+      }
     else if (*line == ':' && loadModule != 0) {
       line++;
       line = getHex(line, &address);
@@ -286,6 +291,7 @@ int loadFile(char* filename) {
           if (strcmp(references[i], token) == 0) {
             loadModule = -1;
             printf("Linking %s from library\n", token);
+            i = numReferences;
             }
         if (loadModule == 0) {
           for (i=0; i<numRequires; i++)
