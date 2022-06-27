@@ -106,8 +106,19 @@ int loadFile(char* filename) {
   offset = 0;
   file = fopen(filename,"r");
   if (file == NULL) {
-    printf("Could not open input file: %s\n",filename);
-    return -1;
+    if (libScan != 0) {
+      strcpy(buffer, LIBPATH);
+      strcat(buffer, filename);
+      file = fopen(buffer, "r");
+      if (file == NULL) {
+        printf("Could not open library file: %s\n",filename);
+        return -1;
+        }
+      }
+    else {
+      printf("Could not open input file: %s\n",filename);
+      return -1;
+      }
     }
   while (fgets(buffer, 1023, file) != NULL) {
     line = buffer;

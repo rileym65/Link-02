@@ -27,6 +27,8 @@
 #define BM_RCS         4
 #define BM_INTEL       5
 
+#define LIBPATH        "/usr/local/lib/"
+
 typedef unsigned char byte;
 typedef unsigned short word;
 
