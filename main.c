@@ -158,6 +158,10 @@ int loadFile(char* filename) {
       flag = 0;
       for (i=0; i<numRequires; i++)
         if (strcmp(token, requires[i]) == 0) flag = -1;
+      for (i=0; i<numSymbols; i++)
+        if (strcmp(token, symbols[i]) == 0) {
+          flag = -1;
+          }
       if (flag == 0) {
         numRequires++;
         if (numRequires == 1) {
@@ -248,6 +252,10 @@ int loadFile(char* filename) {
       symbols[numSymbols-1] = (char*)malloc(strlen(token) + 1);
       strcpy(symbols[numSymbols-1], token);
       values[numSymbols-1] = value;
+      for (i=0; i<numRequires; i++)
+        if (strcmp(token, requires[i]) == 0) {
+          requireAdded[i] = 'Y';
+          }
       }
     else if (*line == '?' && loadModule != 0) {
       line++;
@@ -324,6 +332,10 @@ int loadFile(char* filename) {
         symbols[numSymbols-1] = (char*)malloc(strlen(token) + 1);
         strcpy(symbols[numSymbols-1], token);
         values[numSymbols-1] = value;
+        for (i=0; i<numRequires; i++)
+          if (strcmp(token, requires[i]) == 0) {
+            requireAdded[i] = 'Y';
+            }
         }
       }
     else if (*line == '}') {
