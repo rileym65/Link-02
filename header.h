@@ -10,9 +10,11 @@
 #include <io.h>
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
+#define LIBPATH     "C:\\Users\\Public\\Series02\\"
 #else
 #include <unistd.h>
 #define O_BINARY 0
+#define LIBPATH        "/usr/local/lib/"
 #endif
 
 #ifdef MAIN
@@ -27,7 +29,7 @@
 #define BM_RCS         4
 #define BM_INTEL       5
 
-#define LIBPATH        "/usr/local/lib/"
+
 
 typedef unsigned char byte;
 typedef unsigned short word;
