@@ -64,5 +64,9 @@ LINK int    loadModule;
 LINK char **requires;
 LINK char  *requireAdded;
 LINK int    numRequires;
+LINK char **incPath;
+LINK int    numIncPath;
+LINK char **libPath;
+LINK int    numLibPath;
 
 #endif

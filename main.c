@@ -93,6 +93,7 @@ int loadFile(char* filename) {
   int   j;
   char  buffer[1024];
   char  token[256];
+  char  path[2048];
   int   pos;
   int   flag;
   FILE *file;
@@ -111,13 +112,35 @@ int loadFile(char* filename) {
       strcat(buffer, filename);
       file = fopen(buffer, "r");
       if (file == NULL) {
-        printf("Could not open library file: %s\n",filename);
-        return -1;
+        i = 0;
+        while (i < numLibPath) {
+          strcpy(path, libPath[i]);
+          if (path[strlen(path)-1] != '/') strcat(path,"/");
+          strcat(path, filename);
+          file = fopen(buffer, "r");
+          if (file != NULL) i = numLibPath;
+          i++;
+          }
+        if (file == NULL) {
+          printf("Could not open library file: %s\n",filename);
+          return -1;
+          }
         }
       }
     else {
-      printf("Could not open input file: %s\n",filename);
-      return -1;
+      i = 0;
+      while (i < numIncPath) {
+        strcpy(path, incPath[i]);
+        if (path[strlen(path)-1] != '/') strcat(path,"/");
+        strcat(path, filename);
+        file = fopen(buffer, "r");
+        if (file != NULL) i = numIncPath;
+        i++;
+        }
+      if (file == NULL) {
+        printf("Could not open input file: %s\n",filename);
+        return -1;
+        }
       }
     }
   while (fgets(buffer, 1023, file) != NULL) {
@@ -673,6 +696,8 @@ int main(int argc, char **argv) {
   numLibraries = 0;
   numRequires = 0;
   addressMode = 'L';
+  numLibPath = 0;
+  numIncPath = 0;
   strcpy(outName,"");
   outMode = BM_BINARY;
   for (i=1; i<argc; i++) {
@@ -684,6 +709,26 @@ int main(int argc, char **argv) {
     else if (strcmp(argv[i], "-s") == 0) showSymbols = -1;
     else if (strcmp(argv[i], "-be") == 0) addressMode = 'B';
     else if (strcmp(argv[i], "-le") == 0) addressMode = 'L';
+    else if (strcmp(argv[i], "-I") == 0) {
+      i++;
+      numIncPath++;
+      if (numIncPath == 1)
+        incPath = (char**)malloc(sizeof(char*));
+      else
+        incPath = (char**)realloc(incPath, sizeof(char*) * numIncPath);
+      incPath[numIncPath-1] = (char*)malloc(strlen(argv[i]) + 1);
+      strcpy(incPath[numIncPath-1], argv[i]);
+      }
+    else if (strcmp(argv[i], "-L") == 0) {
+      i++;
+      numLibPath++;
+      if (numLibPath == 1)
+        libPath = (char**)malloc(sizeof(char*));
+      else
+        libPath = (char**)realloc(libPath, sizeof(char*) * numLibPath);
+      libPath[numLibPath-1] = (char*)malloc(strlen(argv[i]) + 1);
+      strcpy(libPath[numLibPath-1], argv[i]);
+      }
     else if (strcmp(argv[i], "-o") == 0) {
       i++;
       strcpy(outName, argv[i]);
