@@ -278,6 +278,9 @@ int loadFile(char* filename) {
       line++;
       line = getHex(line, &addr);
       value = memory[addr+offset] + offset;
+      if (((addr+offset) & 0xff00) != (value & 0xff00)) {
+        printf("Error: Short branch out of page at %04x\n", addr+offset);
+        }
       memory[addr+offset] = value & 0xff;
       }
     else if (*line == '=' && loadModule != 0) {
