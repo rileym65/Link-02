@@ -7,6 +7,7 @@ link @controlfile
 -i            - Output Intel hex
 -h            - Output RCS hex
 -s            - Show public symbols
+-S name       - output symbols to file
 -o name       - Specify output filename
 -l name       - Specify library to search
 -be           - Use big-endian mode

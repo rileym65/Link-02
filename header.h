@@ -48,6 +48,8 @@ LINK char **symbols;
 LINK word  *values;
 LINK int    numSymbols;
 LINK int    showSymbols;
+LINK int    createSymbolFile;
+LINK char   symName[1024];
 LINK char **references;
 LINK word  *addresses;
 LINK byte  *lows;

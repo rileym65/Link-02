@@ -661,6 +661,8 @@ void sortSymbols() {
 int main(int argc, char **argv) {
   int   i;
   char *pchar;
+  FILE *symFile;
+  char buffer[256];
   printf("Link/02 v1.0\n");
   printf("By Michael H. Riley\n\n");
   lowest = 0xffff;
@@ -673,7 +675,9 @@ int main(int argc, char **argv) {
   numLibraries = 0;
   numRequires = 0;
   addressMode = 'L';
+  createSymbolFile = 0;
   strcpy(outName,"");
+  strcpy(symName,"");
   outMode = BM_BINARY;
   for (i=1; i<argc; i++) {
     if (strcmp(argv[i], "-b") == 0) outMode = BM_BINARY;
@@ -684,6 +688,11 @@ int main(int argc, char **argv) {
     else if (strcmp(argv[i], "-s") == 0) showSymbols = -1;
     else if (strcmp(argv[i], "-be") == 0) addressMode = 'B';
     else if (strcmp(argv[i], "-le") == 0) addressMode = 'L';
+    else if (strcmp(argv[i], "-S") == 0) {
+      createSymbolFile = -1;
+      i++;
+      strcpy(symName, argv[i]);
+      }
     else if (strcmp(argv[i], "-o") == 0) {
       i++;
       strcpy(outName, argv[i]);
@@ -765,6 +774,19 @@ int main(int argc, char **argv) {
     for (i=0; i<numSymbols; i++)
       printf("%-20s %04x\n",symbols[i], values[i]);
     }
+  if (createSymbolFile) {
+    sortSymbols();
+    symFile = fopen(symName, "w");
+    if (symFile == NULL) {
+      printf("Could not create symbol file\n");
+      }
+    else {
+      for (i=0; i<numSymbols; i++) {
+        fprintf(symFile,"%-20s %04x\n",symbols[i], values[i]);
+        }
+      }
+    }
+
   printf("\n");
   return 0;
   }
