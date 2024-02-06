@@ -117,7 +117,7 @@ int loadFile(char* filename) {
           strcpy(path, libPath[i]);
           if (path[strlen(path)-1] != '/') strcat(path,"/");
           strcat(path, filename);
-          file = fopen(buffer, "r");
+          file = fopen(path, "r");
           if (file != NULL) i = numLibPath;
           i++;
           }
@@ -133,7 +133,7 @@ int loadFile(char* filename) {
         strcpy(path, incPath[i]);
         if (path[strlen(path)-1] != '/') strcat(path,"/");
         strcat(path, filename);
-        file = fopen(buffer, "r");
+        file = fopen(path, "r");
         if (file != NULL) i = numIncPath;
         i++;
         }
@@ -717,6 +717,7 @@ int main(int argc, char **argv) {
       createSymbolFile = -1;
       i++;
       strcpy(symName, argv[i]);
+      }
     else if (strcmp(argv[i], "-I") == 0) {
       i++;
       numIncPath++;
