@@ -5,7 +5,9 @@ link @controlfile
 -c            - Output in .cmd format
 -e            - Output Elf/OS executable
 -i            - Output Intel hex
+-I path       - Additional path for finding objects
 -h            - Output RCS hex
+-L path       - Additional path for libraries
 -s            - Show public symbols
 -S name       - output symbols to file
 -o name       - Specify output filename
