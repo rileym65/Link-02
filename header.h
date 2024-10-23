@@ -23,6 +23,8 @@
 #define LINK extern
 #endif
 
+#define VERSION "1.1"
+
 #define BM_BINARY      1
 #define BM_ELFOS       2
 #define BM_CMD         3

@@ -101,6 +101,7 @@ int loadFile(char* filename) {
   word  addr;
   word  lofs;
   word  low;
+  word  dest;
   char *line;
   if (libScan == 0) printf("Linking: %s\n",filename);
   inProc = 0;
@@ -260,6 +261,20 @@ int loadFile(char* filename) {
       value = memory[addr+offset] + offset;
       memory[addr+offset] = value & 0xff;
       }
+
+    else if (*line == '$' && loadModule != 0) {
+      line++;
+      line = getHex(line, &addr);
+      value = memory[addr+offset];
+      value -= (addr & 0xff);
+      dest = addr+offset+value;
+      if ((dest & 0xff00) != ((addr+offset) & 0xff00)) {
+        printf("Error: Short branch out of page\n");
+        return -1;
+        }
+      memory[addr+offset] = dest & 0xff;
+      }
+
     else if (*line == '=' && loadModule != 0) {
       line++;
       pos = 0;
@@ -686,7 +701,7 @@ int main(int argc, char **argv) {
   char *pchar;
   FILE *symFile;
   char buffer[256];
-  printf("Link/02 v1.0\n");
+  printf("Link/02 v%s\n",VERSION);
   printf("By Michael H. Riley\n\n");
   lowest = 0xffff;
   highest = 0x0000;

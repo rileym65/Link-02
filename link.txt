@@ -12,7 +12,6 @@ link @controlfile
 -S name       - output symbols to file
 -o name       - Specify output filename
 -l name       - Specify library to search
--L path       - Add path to search lift for library files
 -be           - Use big-endian mode
 -le           - Use little-endian mode
 
@@ -56,3 +55,5 @@ object file structure
 ^addr                - apply high byte of module offset at addr
 vaddr                - apply low byte of module offset at addr
 >inc                 - increase current address by 'inc'
+$addr                - apply fixup to 1802 short branch
+
