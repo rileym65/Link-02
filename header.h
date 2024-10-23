@@ -73,4 +73,20 @@ LINK int    numIncPath;
 LINK char **libPath;
 LINK int    numLibPath;
 
+extern void  addLibrary(char* name);
+extern void  addObject(char* name);
+extern void  addReference(char* name, word value, char typ, byte low);
+extern void  doLink();
+extern int   findSymbol(char* name);
+extern char* getHex(char* line, word *value);
+extern int   loadFile(char* filename);
+extern void  outputBinary();
+extern void  outputElfos();
+extern void  outputIntel();
+extern void  outputRcs();
+extern void  readControlFile(char* filename);
+extern word  readMem(word address);
+extern void  sortSymbols();
+extern void  writeMem(word address, word value);
+
 #endif
