@@ -1,7 +1,6 @@
 #include "header.h"
 
 void addReference(char* name, word value, char typ, byte low) {
-printf("Adding reference: %s [%c]\n",name,typ);
   numReferences++;
   if (numReferences == 1) {
     references = (char**)malloc(sizeof(char*));

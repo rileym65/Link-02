@@ -10,20 +10,14 @@ void doLink() {
   errors=0;
   resolved = 0;
   i = 0;
-printf("***** DoLink ********\n");
-printf("unresolved symbols after link:\n");
-for (i=0;i<numReferences;i++) printf("  %s\n",references[i]);
-
-  i = 0;
 //  for (i=0; i<numReferences; i++) {
   while (i < numReferences) {
-    s = findSymbol(references[i]);
+    s = findSymbol(references[i], NULL);
     if (s < 0) {
       i++;
       }
     else {
       resolved++;
-printf("-->Resolved %s\n",references[i]);
       address = addresses[i];
       if (types[i] == 'W') {
         v = readMem(address) + values[s];
@@ -59,6 +53,4 @@ printf("-->Resolved %s\n",references[i]);
         }
       }
     }
-printf("unresolved symbols after link:\n");
-for (i=0;i<numReferences;i++) printf("  %s\n",references[i]);
   }
