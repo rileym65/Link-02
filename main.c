@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
   if (showSymbols) {
     sortSymbols();
     for (i=0; i<numSymbols; i++)
-      printf("%-20s %04x\n",symbols[i], values[i]);
+      printf("%-20s:%-20s %04x\n",symbols[i], symbolModules[i],  values[i]);
     }
   if (createSymbolFile) {
     sortSymbols();

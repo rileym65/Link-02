@@ -1,5 +1,24 @@
 #include "header.h"
 
+void addSymbol(char* token, char* filename, word value) {
+  numSymbols++;
+  if (numSymbols == 1) {
+    symbols = (char**)malloc(sizeof(char*));
+    symbolModules = (char**)malloc(sizeof(char*));
+    values = (word*)malloc(sizeof(word));
+    }
+  else {
+    symbols = (char**)realloc(symbols,sizeof(char*)*numSymbols);
+    symbolModules = (char**)realloc(symbolModules,sizeof(char*)*numSymbols);
+    values = (word*)realloc(values,sizeof(word)*numSymbols);
+    }
+  symbols[numSymbols-1] = (char*)malloc(strlen(token) + 1);
+  strcpy(symbols[numSymbols-1], token);
+  symbolModules[numSymbols-1] = (char*)malloc(strlen(filename)+1);
+  strcpy(symbolModules[numSymbols-1], filename);
+  values[numSymbols-1] = value;
+  }
+
 int loadFile(char* filename) {
   int   i;
   int   j;
@@ -195,29 +214,21 @@ int loadFile(char* filename) {
       while (*line == ' ') line++;
       getHex(line, &value);
       if (inProc) value += offset;
-      for (i=0; i<numSymbols; i++)
-        if (strcmp(token, symbols[i]) == 0) {
-          printf("Error: Duplicate symbol: %s\n",token);
-          fclose(file);
-          return -1;
-          }
-      numSymbols++;
-      if (numSymbols == 1) {
-        symbols = (char**)malloc(sizeof(char*));
-        values = (word*)malloc(sizeof(word));
+      if (findSymbol(token, filename) < 0) {
+        for (i=0; i<numSymbols; i++)
+          if (strcmp(token, symbols[i]) == 0) {
+            printf("Error: Duplicate symbol: %s\n",token);
+            fclose(file);
+            return -1;
+            }
+        addSymbol(token, filename, value);
+        for (i=0; i<numRequires; i++)
+          if (strcmp(token, requires[i]) == 0) {
+            requireAdded[i] = 'Y';
+            }
         }
-      else {
-        symbols = (char**)realloc(symbols,sizeof(char*)*numSymbols);
-        values = (word*)realloc(values,sizeof(word)*numSymbols);
-        }
-      symbols[numSymbols-1] = (char*)malloc(strlen(token) + 1);
-      strcpy(symbols[numSymbols-1], token);
-      values[numSymbols-1] = value;
-      for (i=0; i<numRequires; i++)
-        if (strcmp(token, requires[i]) == 0) {
-          requireAdded[i] = 'Y';
-          }
       }
+
     else if (*line == '?' && loadModule != 0) {
       line++;
       pos = 0;
@@ -257,19 +268,21 @@ int loadFile(char* filename) {
       while (*line != 0 && *line > ' ') token[pos++] = *line++;
       token[pos] = 0;
       if (libScan != 0) {
-        for (i=0; i<numReferences; i++)
-          if (strcmp(references[i], token) == 0) {
-            loadModule = -1;
-            printf("Linking %s from library\n", token);
-            i = numReferences;
-            }
-        if (loadModule == 0) {
-          for (i=0; i<numRequires; i++)
-            if (requireAdded[i] == 'N' && strcmp(requires[i], token) == 0) {
+        if (findSymbol(token, filename) < 0) {
+          for (i=0; i<numReferences; i++)
+            if (strcmp(references[i], token) == 0) {
               loadModule = -1;
-              requireAdded[i] = 'Y';
               printf("Linking %s from library\n", token);
+              i = numReferences;
               }
+          if (loadModule == 0) {
+            for (i=0; i<numRequires; i++)
+              if (requireAdded[i] == 'N' && strcmp(requires[i], token) == 0) {
+                loadModule = -1;
+                requireAdded[i] = 'Y';
+                printf("Linking %s from library\n", token);
+                }
+            }
           }
         }
       if (loadModule != 0) {
@@ -282,18 +295,7 @@ int loadFile(char* filename) {
             }
         inProc = -1;
         offset = address;
-        numSymbols++;
-        if (numSymbols == 1) {
-          symbols = (char**)malloc(sizeof(char*));
-          values = (word*)malloc(sizeof(word));
-          }
-        else {
-          symbols = (char**)realloc(symbols,sizeof(char*)*numSymbols);
-          values = (word*)realloc(values,sizeof(word)*numSymbols);
-          }
-        symbols[numSymbols-1] = (char*)malloc(strlen(token) + 1);
-        strcpy(symbols[numSymbols-1], token);
-        values[numSymbols-1] = value;
+        addSymbol(token, filename, value);
         for (i=0; i<numRequires; i++)
           if (strcmp(token, requires[i]) == 0) {
             requireAdded[i] = 'Y';
